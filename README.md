@@ -2,7 +2,7 @@
 
 **A movie discovery app with a C++ recommendation engine and a Flask-powered interface.**
 
-CineMatch pairs a hand-curated catalogue of 67 films across 9 genres with a small, dependency-free
+CineMatch pairs a hand-curated catalogue of 77 films across 9 genres with a small, dependency-free
 C++ engine that filters and ranks recommendations. The Flask layer validates every request, runs the
 engine in a sandboxed subprocess, and returns clean JSON that drives a fully responsive, single-page
 front end.
@@ -50,7 +50,7 @@ layer and a native C++ core.
 
 | Area | What you get |
 | --- | --- |
-| **Discovery** | Browse 67 curated films across 9 genres, ranked by rating |
+| **Discovery** | Browse 77 curated films across 9 genres, ranked by rating |
 | **Filtering** | Genre, decade (1980s–2020s), and minimum rating |
 | **Search** | Live title autocomplete, plus client-side title filtering |
 | **Spotlight** | Auto-rotating hero carousel for the top results |
