@@ -4,7 +4,7 @@
 
 CineMatch pairs a hand-curated catalogue of 77 films across 9 genres with a small, dependency-free
 C++ engine that filters and ranks recommendations. The Flask layer validates every request, runs the
-engine in a sandboxed subprocess, and returns clean JSON that drives a fully responsive, single-page
+engine in an isolated subprocess, and returns clean JSON that drives a fully responsive, single-page
 front end.
 
 [![CI](https://github.com/Shivam81137/movie-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/Shivam81137/movie-rs/actions/workflows/ci.yml)
@@ -17,6 +17,7 @@ front end.
 
 ## Table of contents
 
+- [Quick start](#quick-start)
 - [Overview](#overview)
 - [Features](#features)
 - [Architecture](#architecture)
@@ -33,6 +34,24 @@ front end.
 - [License](#license)
 
 ---
+
+## Quick start
+
+```bash
+git clone https://github.com/Shivam81137/movie-rs.git
+cd movie-rs
+
+python -m venv .venv
+# Windows: .\.venv\Scripts\Activate.ps1
+# macOS/Linux: source .venv/bin/activate
+
+python -m pip install -r requirements.txt
+make build          # or: g++ -O2 -std=c++17 engine.cpp -o engine(.exe)
+python app.py
+```
+
+Open <http://127.0.0.1:5000>. Full platform-specific instructions are in
+[Getting started](#getting-started).
 
 ## Overview
 
@@ -75,9 +94,9 @@ flowchart LR
     F -->|JSON array| B
 ```
 
-**Why a subprocess?** The engine is deliberately isolated from the web process: it has no network
-or file access, receives a fixed argument array, and runs with a hard timeout. This keeps the C++
-core simple and prevents the web layer from inheriting native crashes.
+**Why a subprocess?** The engine stays separate from the web process: it receives a fixed argument
+array, runs with a hard timeout, and its output is parsed defensively. This keeps the C++ core simple
+and prevents a native crash from taking down the web app.
 
 ## Tech stack
 
@@ -306,8 +325,8 @@ The project intentionally keeps its attack surface small. Current safeguards:
   user input can never be interpreted as a shell command.
 - **Strict input validation.** Genre and decade are checked against allow-lists; ratings must match a
   numeric pattern and fall within `0–10`.
-- **Resource limits.** A 5-second engine timeout, capped request body (8 KB), bounded autocomplete
-  query length, and a maximum result set prevent trivial denial-of-service paths.
+- **Resource limits.** A 5-second engine timeout, capped request body (8 KB), and a bounded
+  autocomplete query length prevent trivial denial-of-service paths.
 - **Debug mode off by default.** `FLASK_DEBUG` must be explicitly set; the default bind address is
   loopback-only (`127.0.0.1`).
 - **Security headers.** Every response includes a Content-Security-Policy, `X-Content-Type-Options`,
@@ -341,9 +360,8 @@ Code style expectations:
 The repository ships with a `.gitignore` that excludes `.venv/`, `__pycache__/`, `output/`, and all
 compiled binaries. If you add a new generated artifact, ignore it rather than committing it.
 
-> **Note:** files removed from tracking remain in earlier commits. Purging them from history
-> requires a rewrite (for example, `git filter-repo`) followed by a coordinated force-push. Do this
-> only after confirming that no one else has open work based on the old history.
+> The history has been cleaned with `git filter-repo`, so generated files are absent from every
+> commit on `main`. If you fork or mirror this repository, keep the same ignore rules to stay clean.
 
 ## Troubleshooting
 
